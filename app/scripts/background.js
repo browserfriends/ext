@@ -3,7 +3,11 @@ let id = "NA";
 let currentLat = 0;
 let currentLon = 0;
 
-const SERVER_ADDRESS = "https://btogether.herokuapp.com/api/";
+let SERVER_ADDRESS = "https://btogether.herokuapp.com/api/";
+const debug = true;
+if(debug){
+  SERVER_ADDRESS = "http://localhost:5000/api/"
+}
 
 fetch(SERVER_ADDRESS + "down/id")
   .then(function(response) {
