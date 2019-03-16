@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Install</title>
+</head>
+<body>
+<div id="sorry" style="display: block;">
+<h1>Sorry</h1>
+    <p>I am only distributing a signed binary for Firefox.</p>
+    <p>The plugin itself is written with WebExtensions, so it should work in Edge, Chrome, and Opera as well. You could <a href="https://github.com/falkirks/more-options">download the code</a> and try to build it yourself.</p>
+</div>
+
+<div id="installing" style="display: none;">
+    <h1>Installing...</h1>
+    <p>You should see a prompt to install now.</p>
+</div>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function(event) {
+    if(navigator.userAgent.search("Firefox") > -1){
+      document.getElementById('sorry').style.display = "none";
+      document.getElementById('installing').style.display = "block";
+      var params = {
+        "Foo": { URL: "https://github.com/falkirks/more-options/raw/master/docs/third_option-0.0.2-fx.xpi",
+          IconURL: "",
+          Hash: "sha1:0287E5D2826D90B58F002BFE2C04846C6B779BC5",
+          toString: function () { return this.URL; }
+        }
+      };
+      InstallTrigger.install(params);
+    }
+  })
+
+</script>
+
+</body>
+</html>
