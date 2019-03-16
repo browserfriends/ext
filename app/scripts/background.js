@@ -51,7 +51,6 @@ function sendMetric(message) {
 function createNotify(title, content){
   browser.notifications.create({
     "type": "basic",
-    "iconUrl": browser.extension.getURL("link.png"),
     "title": title,
     "message": content
   });
