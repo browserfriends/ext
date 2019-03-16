@@ -9,6 +9,8 @@ if(debug){
   SERVER_ADDRESS = "http://localhost:5000/api/"
 }
 
+let notificationsFun = {};
+
 fetch(SERVER_ADDRESS + "down/id")
   .then(function(response) {
     console.log(response);
@@ -18,11 +20,21 @@ fetch(SERVER_ADDRESS + "down/id")
     id = json['id'];
 });
 
+browser.notifications.onClicked.addListener(onAlertClick);
 browser.runtime.onMessage.addListener(notify);
 
 browser.runtime.onInstalled.addListener((details) => {
   console.log('previousVersion', details.previousVersion)
-})
+});
+
+function onAlertClick(id) {
+  console.log(id);
+  console.log(notificationsFun);
+  if(notificationsFun[id] != null){
+    notificationsFun[id]();
+    notificationsFun[id] = null;
+  }
+}
 
 function notify(message, sender, sendResponse) {
   switch(message.intent){
@@ -30,7 +42,9 @@ function notify(message, sender, sendResponse) {
       sendResponse({intent: 'id', id: id});
       break;
     case 'notify':
-      createNotify(message.title, message.content);
+      createNotifyClick(message.title, message.content, function () {
+        console.log("CLICK!!!! " + message.content);
+      });
       break;
     case 'sendMetric':
       sendMetric(message);
@@ -57,10 +71,23 @@ function createNotify(title, content){
   });
 }
 
+function createNotifyClick(title, content, cb){
+  browser.notifications.create({
+    "type": "basic",
+    "iconUrl": browser.extension.getURL("images/icon-128.png"),
+    "title": title,
+    "message": content
+  }).then(function (myId) {
+    notificationsFun[myId] = cb;
+  });
+}
+
 function execServerCommand(message){
   switch (message.type) {
     case 'notify':
-      createNotify(message.title, message.content);
+      createNotifyClick(message.title, message.content, function () {
+        console.log("CLICK!!!! " + message.content);
+      });
       break;
   }
   console.log(message);
