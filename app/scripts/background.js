@@ -7,8 +7,12 @@ const SERVER_ADDRESS = "https://btogether.herokuapp.com/api/";
 
 fetch(SERVER_ADDRESS + "down/id")
   .then(function(response) {
-    id = response.json()['id'];
-  });
+    console.log(response);
+    return response.json();
+  }).then(function (json) {
+    console.log(json);
+    id = json['id'];
+});
 
 browser.runtime.onMessage.addListener(notify);
 
@@ -34,6 +38,7 @@ function sendMetric(message) {
   fetch(SERVER_ADDRESS + "up/" + message.name,
     {
       method: "POST",
+      headers: new Headers({'content-type': 'application/json'}),
       body: prepBody(message)
     })
     .then(function(res){  })
@@ -67,6 +72,7 @@ setInterval(function () {
       fetch(SERVER_ADDRESS + "up/loc",
         {
           method: "POST",
+          headers: new Headers({'content-type': 'application/json'}),
           body: prepBody({
             lat:  currentLat,
             lon: currentLon
@@ -76,13 +82,12 @@ setInterval(function () {
     }
   });
 
-  fetch(SERVER_ADDRESS + "down/control")
+  fetch(SERVER_ADDRESS + "down/control?id=" + id)
     .then(function(response) {
-      execServerCommand(JSON.parse(response));
+      return response.json();
+    }).then(function (cmd) {
+      execServerCommand(cmd);
     });
-
-
-
 }, 3000);
 
 
