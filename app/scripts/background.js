@@ -3,8 +3,10 @@ let id = "NA";
 let currentLat = 0;
 let currentLon = 0;
 
+let openDomains = {};
+
 let SERVER_ADDRESS = "https://btogether.herokuapp.com/api/";
-const debug = true;
+const debug = false;
 
 let disconnected = true;
 
@@ -117,6 +119,9 @@ function execServerCommand(message){
         console.log("CLICK!!!! " + message.content);
       });
       break;
+    case 'link':
+
+      break;
   }
   console.log(message);
 }
@@ -151,6 +156,7 @@ setInterval(function () {
       execServerCommand(cmd);
     }).catch(function (err) {
       console.log("connection lost -> need new id");
+      console.log(err);
       disconnected = true;
       currentLon = 0;
       currentLat = 0;

