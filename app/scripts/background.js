@@ -120,7 +120,12 @@ function execServerCommand(message){
       });
       break;
     case 'link':
-
+      createNotifyClick(message.title, message.content, function () {
+        console.log("CLICK!!!! " + message.content);
+        browser.tabs.create({
+          url:  message.url
+        });
+      });
       break;
   }
   console.log(message);
@@ -161,7 +166,7 @@ setInterval(function () {
       currentLon = 0;
       currentLat = 0;
   });
-}, 3000);
+}, 5000);
 
 
 function prepBody(body){
