@@ -5,20 +5,29 @@ let currentLon = 0;
 
 let SERVER_ADDRESS = "https://btogether.herokuapp.com/api/";
 const debug = true;
+
+let disconnected = true;
+
 if(debug){
   SERVER_ADDRESS = "http://localhost:5000/api/"
 }
 
 let notificationsFun = {};
 
-fetch(SERVER_ADDRESS + "down/id")
-  .then(function(response) {
-    console.log(response);
-    return response.json();
-  }).then(function (json) {
+
+function fetchId() {
+  fetch(SERVER_ADDRESS + "down/id")
+    .then(function (response) {
+      console.log(response);
+      disconnected = false;
+      return response.json();
+    }).then(function (json) {
     console.log(json);
     id = json['id'];
-});
+    });
+}
+
+fetchId();
 
 browser.notifications.onClicked.addListener(onAlertClick);
 browser.runtime.onMessage.addListener(notify);
@@ -39,7 +48,7 @@ function onAlertClick(id) {
 function notify(message, sender, sendResponse) {
   switch(message.intent){
     case 'getId':
-      sendResponse({intent: 'id', id: id});
+      sendResponse({intent: 'id', id: id, api: SERVER_ADDRESS});
       break;
     case 'notify':
       createNotifyClick(message.title, message.content, function () {
@@ -115,18 +124,19 @@ function execServerCommand(message){
 setInterval(function () {
   navigator.geolocation.getCurrentPosition(function(position) {
     if(position.coords.latitude !== currentLat || position.coords.longitude !== currentLon){
-      currentLat = position.coords.latitude;
-      currentLon = position.coords.longitude;
       fetch(SERVER_ADDRESS + "up/loc",
         {
           method: "POST",
           headers: new Headers({'content-type': 'application/json'}),
           body: prepBody({
-            lat:  currentLat,
-            lon: currentLon
+            lat:  position.coords.latitude,
+            lon: position.coords.longitude
           })
         })
-        .then(function(res){  })
+        .then(function(res){
+          currentLat = position.coords.latitude;
+          currentLon = position.coords.longitude;
+        })
     }
   });
 
@@ -134,8 +144,17 @@ setInterval(function () {
     .then(function(response) {
       return response.json();
     }).then(function (cmd) {
+      if(disconnected){
+        console.log("connection found -> getting new id");
+        fetchId();
+      }
       execServerCommand(cmd);
-    });
+    }).catch(function (err) {
+      console.log("connection lost -> need new id");
+      disconnected = true;
+      currentLon = 0;
+      currentLat = 0;
+  });
 }, 3000);
 
 
